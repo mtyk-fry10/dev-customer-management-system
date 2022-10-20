@@ -1,0 +1,36 @@
+version: '3'
+services:
+  app:
+    container_name: Customer_app
+    build: ./docker
+    ports:
+      - "1000:80"
+    volumes:
+      - ./src:/var/www/html
+
+  db:
+    image: mysql:5.7
+    container_name: Customer_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: CustomerManagement
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      TZ: 'Asia/Tokyo'
+
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5
+    container_name: Customer_admin
+    links:
+      - db
+    ports:
+      - 1100:80
+    volumes:
+      - ./docker/phpmyadmin/sessions:/sessions
